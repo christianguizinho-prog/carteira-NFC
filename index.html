@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="NFC Wallet - Carteira digital para gerenciamento de tags NFC">
+
+    <title>NFC Wallet</title>
+
+
+    <!-- GOOGLE FONTS -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+
+
+    <!-- CSS -->
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+    <link
+    rel="manifest"
+    href="./manifest.json">
+
+<meta
+    name="theme-color"
+    content="#00cfff">
+
+</head>
+    
+<script>
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+            navigator.serviceWorker.register("./sw.js")
+                .then(() => {
+                    console.log("NFC Wallet PWA ativo.");
+                })
+                .catch(error => {
+                    console.error(
+                        "Erro ao registrar PWA:",
+                        error
+                    );
+                });
+        });
+    }
+</script>
+
+<body>
+
+
+    <!-- =====================================
+         BACKGROUND
+    ====================================== -->
+
+    <div class="background"></div>
+
+
+
+    <!-- =====================================
+         TELA DE AUTENTICAÇÃO
+    ====================================== -->
+
+    <section
+        id="authScreen"
+        class="auth-screen">
+
+        <div class="auth-box">
+
+
+            <div class="auth-logo">
+                ◈ NFC WALLET
+            </div>
+
+
+            <h1 id="authTitle">
+                Entrar
+            </h1>
+
+
+            <p id="authDescription">
+                Acesse sua carteira NFC.
+            </p>
+
+
+
+            <form id="authForm">
+
+
+                <!-- NOME -->
+
+                <input
+                    type="text"
+                    id="nomeInput"
+                    class="auth-input"
+                    placeholder="Seu nome"
+                    autocomplete="name"
+                    style="display: none;">
+
+
+                <!-- EMAIL -->
+
+                <input
+                    type="email"
+                    id="emailInput"
+                    class="auth-input"
+                    placeholder="E-mail"
+                    autocomplete="email"
+                    required>
+
+
+                <!-- SENHA -->
+
+                <input
+                    type="password"
+                    id="passwordInput"
+                    class="auth-input"
+                    placeholder="Senha"
+                    autocomplete="current-password"
+                    minlength="6"
+                    required>
+
+
+                <!-- BOTÃO -->
+
+                <button
+                    type="submit"
+                    id="authBtn"
+                    class="main-btn auth-button">
+
+                    Entrar
+
+                </button>
+
+
+            </form>
+
+
+
+            <!-- ALTERNAR LOGIN/CADASTRO -->
+
+            <button
+                type="button"
+                id="toggleAuth"
+                class="auth-link">
+
+                Criar uma conta
+
+            </button>
+
+
+            <!-- MENSAGEM -->
+
+            <p
+                id="authMessage"
+                class="auth-message">
+            </p>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================
+         APLICAÇÃO
+    ====================================== -->
+
+    <div
+        id="app"
+        class="app"
+        style="display: none;">
+
+
+        <main class="container">
+
+
+
+            <!-- =====================================
+                 HEADER
+            ====================================== -->
+
+            <header>
+
+
+                <div class="brand">
+
+                    <span class="status-dot"></span>
+
+                    <span>
+                        NFC WALLET
+                    </span>
+
+                </div>
+
+
+
+                <div class="header-actions">
+
+
+                    <!-- TEMA -->
+
+                    <button
+                        id="themeBtn"
+                        class="icon-btn"
+                        title="Alterar tema">
+
+                        ☾
+
+                    </button>
+
+
+                    <!-- LOGOUT -->
+
+                    <button
+                        id="logoutBtn"
+                        class="logout-btn">
+
+                        Sair
+
+                    </button>
+
+
+                </div>
+
+
+            </header>
+
+
+
+            <!-- =====================================
+                 HERO
+            ====================================== -->
+
+            <section class="hero">
+
+
+                <p class="small-title">
+                    CARTEIRA DIGITAL
+                </p>
+
+
+                <h1>
+
+                    Minha
+
+                    <span>
+                        NFC
+                    </span>
+
+                    Wallet
+
+                </h1>
+
+
+                <p class="description">
+
+                    Gerencie suas tags NFC e acompanhe
+                    suas últimas leituras em um único lugar.
+
+                </p>
+
+
+            </section>
+
+
+
+            <!-- =====================================
+                 PERFIL
+            ====================================== -->
+
+            <section class="profile-bar">
+
+
+                <div class="profile-avatar">
+                    ◉
+                </div>
+
+
+                <div>
+
+                    <small>
+                        USUÁRIO
+                    </small>
+
+
+                    <strong id="userName">
+                        Carregando...
+                    </strong>
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =====================================
+                 CARTEIRA
+            ====================================== -->
+
+            <section class="wallet-card">
+
+
+                <div class="card-glow"></div>
+
+
+                <div class="card-top">
+
+                    <span>
+                        NFC WALLET
+                    </span>
+
+
+                    <span class="chip">
+                        ◈
+                    </span>
+
+                </div>
+
+
+
+                <div class="card-middle">
+
+                    <span id="cardName">
+                        USUÁRIO NFC
+                    </span>
+
+                </div>
+
+
+
+                <div class="card-bottom">
+
+
+                    <div>
+
+                        <small>
+                            ID DA TAG
+                        </small>
+
+
+                        <strong id="cardId">
+                            NÃO CONECTADA
+                        </strong>
+
+                    </div>
+
+
+
+                    <div class="nfc-symbol">
+                        ))))
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =====================================
+                 CONTROLES
+            ====================================== -->
+
+            <section class="controls">
+
+
+                <!-- LER NFC -->
+
+                <button
+                    id="readNfcBtn"
+                    class="main-btn">
+
+                    <span>
+                        ◉
+                    </span>
+
+                    Ler NFC
+
+                </button>
+
+
+
+                <!-- ADICIONAR -->
+
+                <button
+                    id="addBtn"
+                    class="secondary-btn">
+
+                    +
+
+                    Adicionar cartão
+
+                </button>
+
+
+            </section>
+
+
+
+            <!-- =====================================
+                 STATUS
+            ====================================== -->
+
+            <section class="info-grid">
+
+
+                <!-- STATUS -->
+
+                <div class="info-box">
+
+
+                    <span class="info-icon">
+                        ◉
+                    </span>
+
+
+                    <div>
+
+                        <small>
+                            STATUS
+                        </small>
+
+
+                        <strong id="status">
+                            Aguardando NFC
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- DISPOSITIVO -->
+
+                <div class="info-box">
+
+
+                    <span class="info-icon">
+                        ▣
+                    </span>
+
+
+                    <div>
+
+                        <small>
+                            DISPOSITIVO
+                        </small>
+
+
+                        <strong id="device">
+                            Verificando...
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =====================================
+                 TAG ATUAL
+            ====================================== -->
+
+            <section class="current-tag">
+
+    <div class="section-title">
+
+        <h2>
+            Tag atual
+        </h2>
+
+        <button
+            id="refreshTag"
+            type="button">
+            Atualizar
+        </button>
+
+    </div>
+
+    <div
+        id="currentTagBox"
+        class="current-tag-box">
+
+        <div class="current-tag-icon">
+            ◈
+        </div>
+
+        <div class="tag-information">
+
+            <strong id="currentTagName">
+                Nenhuma tag selecionada
+            </strong>
+
+            <small id="currentTagId">
+                Faça uma leitura NFC.
+            </small>
+
+            <span
+                id="tagVisibility"
+                class="tag-visibility private">
+                🔒 Privada
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTROLES DA TAG -->
+
+    <div
+        id="tagManagement"
+        class="tag-management"
+        style="display: none;">
+
+        <button
+            id="togglePublicBtn"
+            class="secondary-btn"
+            type="button">
+
+            🌐 Tornar pública
+
+        </button>
+
+        <button
+            id="shareTagBtn"
+            class="secondary-btn"
+            type="button">
+
+            🔗 Compartilhar
+
+        </button>
+
+    </div>
+
+</section>
+
+
+            <!-- =====================================
+                 HISTÓRICO
+            ====================================== -->
+
+            <section class="history">
+
+
+                <div class="section-title">
+
+
+                    <h2>
+                        Últimas leituras
+                    </h2>
+
+
+                    <button
+                        id="refreshHistory">
+
+                        Atualizar
+
+                    </button>
+
+
+                </div>
+
+
+
+                <div
+                    id="historyList"
+                    class="history-list">
+
+
+                    <div class="empty">
+
+
+                        <span>
+                            ◌
+                        </span>
+
+
+                        <p>
+
+                            Nenhuma tag NFC foi lida.
+
+                        </p>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =====================================
+                 GERENCIAMENTO DE TAGS
+            ====================================== -->
+
+            <section class="tag-manager">
+
+
+                <!-- TÍTULO -->
+
+                <div class="section-title">
+
+
+                    <div>
+
+
+                        <h2>
+                            Minhas Tags NFC
+                        </h2>
+
+
+                        <p class="section-description">
+
+                            Gerencie todas as suas tags
+                            cadastradas.
+
+                        </p>
+
+
+                    </div>
+
+
+
+                    <!-- NOVA TAG -->
+
+                    <button
+                        id="openAddTagBtn"
+                        class="main-btn small-btn">
+
+                        + Nova Tag
+
+                    </button>
+
+
+                </div>
+
+
+
+                <!-- =====================================
+                     PESQUISA
+                ====================================== -->
+
+                <div class="search-box">
+
+
+                    <span>
+                        ⌕
+                    </span>
+
+
+                    <input
+                        type="text"
+                        id="searchTagInput"
+                        placeholder="Pesquisar tag...">
+
+
+                </div>
+
+
+
+                <!-- =====================================
+                     CONTADOR
+                ====================================== -->
+
+                <div class="tag-counter">
+
+
+                    <span>
+                        Tags cadastradas
+                    </span>
+
+
+                    <strong id="tagCount">
+                        0
+                    </strong>
+
+
+                </div>
+
+
+
+                <!-- =====================================
+                     LISTA DE TAGS
+                ====================================== -->
+
+                <div
+                    id="tagManagerList"
+                    class="tag-manager-list">
+
+
+                    <!-- ESTADO VAZIO -->
+
+                    <div class="empty">
+
+
+                        <span>
+                            ◈
+                        </span>
+
+
+                        <p>
+                            Nenhuma tag cadastrada.
+                        </p>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =====================================
+                 RODAPÉ
+            ====================================== -->
+
+            <footer>
+
+
+                <span>
+                    NFC WALLET
+                </span>
+
+
+                <span>
+                    Sistema de gerenciamento NFC
+                </span>
+
+
+            </footer>
+
+
+
+        </main>
+
+
+    </div>
+
+
+
+    <!-- =====================================
+         MODAL DE TAG
+    ====================================== -->
+
+    <div
+        id="modal"
+        class="modal">
+
+
+        <div class="modal-content">
+
+
+            <!-- FECHAR -->
+
+            <button
+                id="closeModal"
+                class="close"
+                type="button">
+
+                ×
+
+            </button>
+
+
+
+            <!-- ÍCONE -->
+
+            <div class="modal-icon">
+                ◈
+            </div>
+
+
+
+            <h2>
+                Nomear tag NFC
+            </h2>
+
+
+
+            <p>
+
+                Dê um nome para identificar esta tag
+                na sua carteira.
+
+            </p>
+
+
+
+            <!-- NOME -->
+
+            <input
+                type="text"
+                id="nameInput"
+                class="modal-input"
+                placeholder="Nome da tag"
+                maxlength="100">
+
+
+
+            <!-- ID NFC -->
+
+            <input
+                type="text"
+                id="tagIdInput"
+                class="modal-input"
+                placeholder="ID da tag NFC"
+                maxlength="255">
+
+
+
+            <!-- SALVAR -->
+
+            <button
+                id="saveBtn"
+                class="main-btn modal-button">
+
+                Salvar tag
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================
+         TOAST
+    ====================================== -->
+
+    <div
+        id="toast"
+        class="toast">
+
+
+        <span id="toastIcon">
+            ✓
+        </span>
+
+
+        <span id="toastMessage">
+            Operação realizada.
+        </span>
+
+
+    </div>
+
+
+
+    <!-- =====================================
+         JAVASCRIPT
+    ====================================== -->
+
+    <script
+        type="module"
+        src="script.js">
+    </script>
+
+
+</body>
+
+</html>
