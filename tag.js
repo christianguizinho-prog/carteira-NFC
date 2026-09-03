@@ -176,6 +176,35 @@ function mostrarTag(tag) {
     document.title =
         `NFC Wallet | ${nome}`;
 
+    document.getElementById("publicContact")?.remove();
+    if (tag.contato_publico) {
+        const rawContact = tag.contato_publico.trim();
+        const href = rawContact.includes("@")
+            ? `mailto:${rawContact}`
+            : rawContact;
+        if (!/^(mailto:|https?:\/\/)/i.test(href)) return;
+        const contact = document.createElement("a");
+        contact.id = "publicContact";
+        contact.className = "button";
+        contact.href = href;
+        contact.textContent = "Entrar em contato";
+        tagDescription.after(contact);
+    }
+
+    document.documentElement.style.setProperty(
+        "--cyan",
+        /^#[0-9a-f]{6}$/i.test(tag.cor_publica || "")
+            ? tag.cor_publica
+            : "#00ffff"
+    );
+
+    if (tag.modo_perdida) {
+        statusElement.classList.add("private");
+        statusElement.lastElementChild.textContent = "ITEM PERDIDO";
+        tagDescription.textContent = tag.mensagem_perdida ||
+            "Este item foi marcado como perdido. Entre em contato com o proprietário.";
+    }
+
 }
 
 
@@ -216,7 +245,11 @@ async function carregarTag() {
                     descricao,
                     publica,
                     criada_em,
-                    atualizada_em
+                    atualizada_em,
+                    cor_publica,
+                    modo_perdida,
+                    mensagem_perdida,
+                    contato_publico
                 `)
                 .eq(
                     "id",
@@ -248,6 +281,11 @@ async function carregarTag() {
 
             return;
         }
+
+        await supabase.from("acessos_publicos").insert({
+            tag_id: data.id,
+            origem: new URLSearchParams(window.location.search).get("origem") || "link"
+        });
 
 
         mostrarTag(data);
