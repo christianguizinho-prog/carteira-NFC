@@ -1,4 +1,5 @@
 import { supabase } from "./supabase.js";
+import { getNdefIdentifier } from "./nfc.js";
 
 
 // =====================================================
@@ -699,6 +700,10 @@ async function carregarTags() {
                 "usuario_id",
                 usuarioAtual.id
             )
+            .eq(
+                "arquivada",
+                false
+            )
             .order(
                 "criada_em",
                 {
@@ -941,6 +946,8 @@ function mostrarTag(tag) {
 
 
     tagAtual = tag;
+
+    document.dispatchEvent(new CustomEvent("tagchange", { detail: tag }));
 
 
     const id =
@@ -1465,13 +1472,19 @@ async function lerNFC() {
                 }
 
 
-                const serialNumber =
-                    event.serialNumber ||
-                    "ID-DESCONHECIDO";
+                const tagIdentifier = getNdefIdentifier(event);
+
+                if (!tagIdentifier) {
+                    mostrarToast(
+                        "Grave um texto ou URL único na tag NFC para identificá-la.",
+                        "error"
+                    );
+                    return;
+                }
 
 
                 cardId.textContent =
-                    serialNumber.toUpperCase();
+                    tagIdentifier.toUpperCase();
 
 
                 statusElement.textContent =
@@ -1484,7 +1497,7 @@ async function lerNFC() {
 
 
                 await processarTag(
-                    serialNumber
+                    tagIdentifier
                 );
 
             };
@@ -1526,6 +1539,7 @@ async function lerNFC() {
     }
 
 }
+
 
 
 function pararLeituraNFC() {

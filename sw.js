@@ -1,5 +1,5 @@
 const CACHE_NAME =
-    "nfc-wallet-v3";
+    "nfc-wallet-v4";
 
 const FILES_TO_CACHE = [
 
@@ -12,6 +12,10 @@ const FILES_TO_CACHE = [
     "./style.css",
 
     "./script.js",
+
+    "./nfc.js",
+
+    "./features.js",
 
     "./supabase.js",
 

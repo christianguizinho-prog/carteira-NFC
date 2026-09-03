@@ -184,3 +184,48 @@ drop policy if exists "leituras_excluir_proprias" on public.leituras_nfc;
 create policy "leituras_excluir_proprias"
     on public.leituras_nfc for delete
     using (auth.uid() = usuario_id);
+
+
+-- =====================================================
+-- RECURSOS AVANÇADOS: perfil público, modo perdido e analytics
+-- Execute esta seção também em bancos já existentes.
+-- =====================================================
+
+alter table public.tags_nfc
+    add column if not exists cor_publica text not null default '#00cfff',
+    add column if not exists contato_publico text,
+    add column if not exists modo_perdida boolean not null default false,
+    add column if not exists mensagem_perdida text,
+    add column if not exists arquivada boolean not null default false;
+
+create table if not exists public.acessos_publicos (
+    id uuid primary key default gen_random_uuid(),
+    tag_id uuid not null references public.tags_nfc (id) on delete cascade,
+    origem text not null default 'link',
+    acessado_em timestamptz not null default now(),
+    constraint acessos_publicos_origem_valida
+        check (origem in ('link', 'nfc', 'qr'))
+);
+
+create index if not exists acessos_publicos_tag_id_idx
+    on public.acessos_publicos (tag_id, acessado_em desc);
+
+alter table public.acessos_publicos enable row level security;
+
+drop policy if exists "acessos_publicos_inserir_anonimo" on public.acessos_publicos;
+create policy "acessos_publicos_inserir_anonimo"
+    on public.acessos_publicos for insert
+    with check (exists (
+        select 1 from public.tags_nfc
+        where tags_nfc.id = acessos_publicos.tag_id
+          and tags_nfc.publica
+    ));
+
+drop policy if exists "acessos_publicos_ler_proprios" on public.acessos_publicos;
+create policy "acessos_publicos_ler_proprios"
+    on public.acessos_publicos for select
+    using (exists (
+        select 1 from public.tags_nfc
+        where tags_nfc.id = acessos_publicos.tag_id
+          and tags_nfc.usuario_id = auth.uid()
+    ));

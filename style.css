@@ -1244,6 +1244,12 @@ input:focus-visible {
     min-width: 170px;
 }
 
+.backup-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 .secondary-btn:disabled {
 
     opacity: .5;
