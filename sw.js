@@ -1,5 +1,5 @@
 const CACHE_NAME =
-    "nfc-wallet-v2";
+    "nfc-wallet-v3";
 
 const FILES_TO_CACHE = [
 
@@ -185,7 +185,14 @@ self.addEventListener(
                     () => {
 
                         return caches
-                            .match(request)
+                            .match(
+                                request,
+                                {
+                                    ignoreSearch:
+                                        request.mode ===
+                                        "navigate"
+                                }
+                            )
                             .then(
                                 cachedResponse => {
 

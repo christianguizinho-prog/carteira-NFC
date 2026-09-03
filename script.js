@@ -158,6 +158,8 @@ let toastTimer = null;
 
 let leituraNfcAtiva = false;
 
+let nfcAbortController = null;
+
 
 // =====================================================
 // TOAST
@@ -1412,10 +1414,19 @@ async function lerNFC() {
     }
 
 
+    const donoDaLeitura =
+        usuarioAtual?.id ||
+        null;
+
+
     try {
 
         const ndef =
             new NDEFReader();
+
+
+        nfcAbortController =
+            new AbortController();
 
 
         statusElement.textContent =
@@ -1426,7 +1437,10 @@ async function lerNFC() {
             true;
 
 
-        await ndef.scan();
+        await ndef.scan({
+            signal:
+                nfcAbortController.signal
+        });
 
 
         leituraNfcAtiva =
@@ -1439,6 +1453,17 @@ async function lerNFC() {
 
         ndef.onreading =
             async event => {
+
+                if (
+                    usuarioAtual?.id !==
+                    donoDaLeitura
+                ) {
+
+                    pararLeituraNFC();
+
+                    return;
+                }
+
 
                 const serialNumber =
                     event.serialNumber ||
@@ -1496,14 +1521,32 @@ async function lerNFC() {
         );
 
 
-        leituraNfcAtiva =
-            false;
-
-
-        readNfcBtn.disabled =
-            false;
+        pararLeituraNFC();
 
     }
+
+}
+
+
+function pararLeituraNFC() {
+
+    if (nfcAbortController) {
+
+        nfcAbortController.abort();
+
+
+        nfcAbortController =
+            null;
+
+    }
+
+
+    leituraNfcAtiva =
+        false;
+
+
+    readNfcBtn.disabled =
+        false;
 
 }
 
@@ -2286,6 +2329,9 @@ logoutBtn.addEventListener(
         }
 
 
+        pararLeituraNFC();
+
+
         usuarioAtual =
             null;
 
@@ -2440,6 +2486,9 @@ supabase.auth.onAuthStateChange(
             event ===
             "SIGNED_OUT"
         ) {
+
+            pararLeituraNFC();
+
 
             usuarioAtual =
                 null;
