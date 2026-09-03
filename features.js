@@ -70,10 +70,8 @@ document.getElementById("qrBtn").addEventListener("click", () => {
   if (!currentTag) return;
   const url = publicUrl(currentTag, "qr");
   const image = `https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=${encodeURIComponent(url)}`;
-  const popup = window.open("", "_blank", "noopener,noreferrer");
-  if (!popup) return toast("Permita pop-ups para abrir o QR Code.", true);
-  popup.document.write(`<title>QR Code | ${currentTag.nome}</title><img alt="QR Code" src="${image}"><p>${url}</p>`);
-  popup.document.close();
+  window.open(image, "_blank", "noopener,noreferrer");
+  toast("QR Code aberto em uma nova aba.");
 });
 
 document.getElementById("profileBtn").addEventListener("click", async () => {
