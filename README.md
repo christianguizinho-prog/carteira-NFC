@@ -1,5 +1,3 @@
-Claro. Vou deixar com cara de **projeto profissional de GitHub**, com banner, badges, descrição, funcionalidades, arquitetura, instalação, Supabase, PWA, screenshots e roadmap.
-
 # ◈ NFC Wallet
 
 <div align="center">
@@ -122,7 +120,12 @@ NFC-Wallet/
 │
 ├── 📱 manifest.json
 ├── ⚙️ sw.js
+├── 🖼️ icons/
+│   ├── icon-192.png
+│   ├── icon-512.png
+│   └── gerar-icones.py
 │
+├── 🗄️ schema.sql
 └── 📖 README.md
 ```
 
@@ -346,7 +349,7 @@ export const supabase =
 
 ## 3. Configure o banco
 
-Execute o SQL do projeto no:
+Copie o conteúdo de `schema.sql` e execute no:
 
 ```text
 Supabase
@@ -354,36 +357,41 @@ Supabase
 SQL Editor
    ↓
 New Query
+   ↓
+Run
 ```
 
-O banco deverá possuir:
-
-```text
-perfis
-tags_nfc
-leituras_nfc
-```
-
-com RLS configurado.
+O script cria as tabelas `perfis`, `tags_nfc` e `leituras_nfc`, os índices,
+os triggers (perfil automático e `atualizada_em`) e todas as políticas de RLS.
 
 ---
 
 ## 4. Executar localmente
 
-Recomenda-se utilizar o **Live Server** no VS Code.
+Qualquer servidor estático funciona (os módulos ES não abrem via `file://`):
 
-```text
-index.html
-    ↓
-Botão direito
-    ↓
-Open with Live Server
+```bash
+python3 -m http.server 5500
 ```
 
-Exemplo:
+Depois acesse:
 
 ```text
 http://127.0.0.1:5500/
+```
+
+No VS Code também é possível usar a extensão **Live Server**.
+
+> A Web NFC exige **HTTPS** (ou `localhost`) e Chrome no Android.
+
+---
+
+## 5. Ícones do PWA
+
+Os ícones já estão em `icons/`. Para gerá-los novamente:
+
+```bash
+python3 icons/gerar-icones.py
 ```
 
 ---
@@ -462,8 +470,8 @@ await ndef.scan();
 | Histórico          | 🟢 Implementado       |
 | Tags públicas      | 🟢 Implementado       |
 | Compartilhamento   | 🟢 Implementado       |
-| Página pública     | 🟡 Em desenvolvimento |
-| PWA                | 🟡 Em desenvolvimento |
+| Página pública     | 🟢 Implementado       |
+| PWA                | 🟢 Implementado       |
 | Analytics          | 🔴 Planejado          |
 | Dashboard avançado | 🔴 Planejado          |
 
@@ -496,11 +504,11 @@ await ndef.scan();
 
 ### 🟡 Fase 4 — PWA
 
-* [ ] Manifest
-* [ ] Service Worker
-* [ ] Instalação
-* [ ] Cache offline
-* [ ] Ícones
+* [x] Manifest
+* [x] Service Worker
+* [x] Instalação
+* [x] Cache offline
+* [x] Ícones
 
 ### 🔴 Fase 5 — Avançado
 

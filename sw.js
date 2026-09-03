@@ -1,5 +1,5 @@
 const CACHE_NAME =
-    "nfc-wallet-v1";
+    "nfc-wallet-v3";
 
 const FILES_TO_CACHE = [
 
@@ -17,7 +17,11 @@ const FILES_TO_CACHE = [
 
     "./tag.js",
 
-    "./manifest.json"
+    "./manifest.json",
+
+    "./icons/icon-192.png",
+
+    "./icons/icon-512.png"
 
 ];
 
@@ -29,10 +33,6 @@ const FILES_TO_CACHE = [
 self.addEventListener(
     "install",
     event => {
-
-        console.log(
-            "NFC Wallet Service Worker instalado."
-        );
 
         event.waitUntil(
 
@@ -47,10 +47,15 @@ self.addEventListener(
 
                     }
                 )
+                .then(
+                    () => {
+
+                        return self.skipWaiting();
+
+                    }
+                )
 
         );
-
-        self.skipWaiting();
 
     }
 );
@@ -90,10 +95,15 @@ self.addEventListener(
 
                     }
                 )
+                .then(
+                    () => {
+
+                        return self.clients.claim();
+
+                    }
+                )
 
         );
-
-        self.clients.claim();
 
     }
 );
@@ -101,6 +111,11 @@ self.addEventListener(
 
 // =====================================================
 // BUSCAR ARQUIVOS
+//
+// Rede primeiro para manter o app sempre atualizado,
+// com o cache servindo apenas como reserva offline.
+// Requisições externas (Supabase, CDN, fontes) e
+// métodos diferentes de GET passam direto pela rede.
 // =====================================================
 
 self.addEventListener(
@@ -118,68 +133,89 @@ self.addEventListener(
         }
 
 
+        const url =
+            new URL(request.url);
+
+
+        if (
+            url.origin !==
+            self.location.origin
+        ) {
+            return;
+        }
+
+
         event.respondWith(
 
-            caches
-                .match(request)
+            fetch(request)
                 .then(
-                    cachedResponse => {
+                    networkResponse => {
 
                         if (
-                            cachedResponse
+                            networkResponse &&
+                            networkResponse.status === 200 &&
+                            networkResponse.type === "basic"
                         ) {
 
-                            return cachedResponse;
+                            const responseClone =
+                                networkResponse.clone();
+
+
+                            caches
+                                .open(CACHE_NAME)
+                                .then(
+                                    cache => {
+
+                                        cache.put(
+                                            request,
+                                            responseClone
+                                        );
+
+                                    }
+                                );
 
                         }
 
 
-                        return fetch(request)
+                        return networkResponse;
+
+                    }
+                )
+                .catch(
+                    () => {
+
+                        return caches
+                            .match(
+                                request,
+                                {
+                                    ignoreSearch:
+                                        request.mode ===
+                                        "navigate"
+                                }
+                            )
                             .then(
-                                networkResponse => {
+                                cachedResponse => {
 
-                                    if (
-                                        !networkResponse ||
-                                        networkResponse.status !== 200 ||
-                                        networkResponse.type ===
-                                            "opaque"
-                                    ) {
+                                    if (cachedResponse) {
 
-                                        return networkResponse;
+                                        return cachedResponse;
 
                                     }
 
 
-                                    const responseClone =
-                                        networkResponse.clone();
+                                    if (
+                                        request.mode ===
+                                        "navigate"
+                                    ) {
 
-
-                                    caches
-                                        .open(
-                                            CACHE_NAME
-                                        )
-                                        .then(
-                                            cache => {
-
-                                                cache.put(
-                                                    request,
-                                                    responseClone
-                                                );
-
-                                            }
+                                        return caches.match(
+                                            "./index.html"
                                         );
 
+                                    }
 
-                                    return networkResponse;
 
-                                }
-                            )
-                            .catch(
-                                () => {
-
-                                    return caches.match(
-                                        "./index.html"
-                                    );
+                                    return Response.error();
 
                                 }
                             );

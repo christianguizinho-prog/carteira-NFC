@@ -1266,3 +1266,259 @@ input:focus-visible {
     }
 
 }
+/* ==========================================
+   MINHAS TAGS NFC
+========================================== */
+
+.tag-manager {
+    margin-top: 40px;
+}
+
+.section-description {
+    margin-top: 6px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+.small-btn {
+    padding: 11px 16px;
+
+    font-size: 12px;
+}
+
+.search-box {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 16px;
+
+    padding: 0 14px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 12px;
+
+    background: var(--card);
+}
+
+.search-box span {
+    color: var(--muted);
+}
+
+.search-box input {
+    width: 100%;
+
+    padding: 13px 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: var(--white);
+
+    font-size: 13px;
+
+    outline: none;
+}
+
+.tag-counter {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-top: 14px;
+
+    padding: 12px 16px;
+
+    border: 1px solid rgba(255, 255, 255, 0.06);
+
+    border-radius: 12px;
+
+    background: rgba(255, 255, 255, 0.025);
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+.tag-counter strong {
+    color: var(--cyan);
+
+    font-family: "Orbitron", sans-serif;
+
+    font-size: 16px;
+}
+
+.tag-manager-list {
+    display: grid;
+
+    gap: 10px;
+
+    margin-top: 14px;
+}
+
+.tag-manager-item {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 15px;
+
+    border: 1px solid rgba(255, 255, 255, 0.06);
+
+    border-radius: var(--radius);
+
+    background: var(--card);
+
+    transition: border-color 0.25s, transform 0.25s;
+}
+
+.tag-manager-item:hover {
+    border-color: var(--border);
+
+    transform: translateY(-2px);
+}
+
+.tag-info {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    min-width: 0;
+}
+
+.tag-manager-item .tag-icon {
+    display: grid;
+
+    place-items: center;
+
+    flex-shrink: 0;
+
+    width: 42px;
+    height: 42px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 12px;
+
+    background: rgba(0, 207, 255, 0.07);
+
+    color: var(--cyan);
+}
+
+.tag-details {
+    min-width: 0;
+}
+
+.tag-details strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: var(--white);
+
+    font-size: 14px;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+.tag-details small {
+    color: var(--muted);
+
+    font-size: 11px;
+
+    word-break: break-all;
+}
+
+.tag-date {
+    color: var(--muted);
+
+    font-size: 10px;
+
+    line-height: 1.6;
+
+    text-align: right;
+}
+
+.tag-actions {
+    display: flex;
+
+    gap: 8px;
+
+    flex-shrink: 0;
+}
+
+.tag-action {
+    width: 34px;
+    height: 34px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.03);
+
+    color: var(--text);
+
+    font-size: 14px;
+
+    transition: 0.25s;
+}
+
+.tag-action.edit:hover {
+    border-color: var(--border);
+
+    color: var(--cyan);
+}
+
+.tag-action.delete:hover {
+    border-color: rgba(255, 82, 107, 0.35);
+
+    color: var(--red);
+}
+
+.modal-textarea {
+    min-height: 88px;
+
+    resize: vertical;
+}
+
+@media (max-width: 600px) {
+
+    .tag-manager-item {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .tag-date {
+        text-align: left;
+    }
+
+    .tag-actions {
+        width: 100%;
+    }
+
+    .tag-action {
+        flex: 1;
+    }
+}
