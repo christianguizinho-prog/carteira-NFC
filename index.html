@@ -46,24 +46,32 @@
     name="theme-color"
     content="#00cfff">
 
+    <link
+        rel="icon"
+        href="./icons/icon-192.png">
+
+    <link
+        rel="apple-touch-icon"
+        href="./icons/icon-192.png">
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js")
+                    .then(() => {
+                        console.log("NFC Wallet PWA ativo.");
+                    })
+                    .catch(error => {
+                        console.error(
+                            "Erro ao registrar PWA:",
+                            error
+                        );
+                    });
+            });
+        }
+    </script>
+
 </head>
-    
-<script>
-    if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-            navigator.serviceWorker.register("./sw.js")
-                .then(() => {
-                    console.log("NFC Wallet PWA ativo.");
-                })
-                .catch(error => {
-                    console.error(
-                        "Erro ao registrar PWA:",
-                        error
-                    );
-                });
-        });
-    }
-</script>
 
 <body>
 
@@ -841,6 +849,17 @@
                 class="modal-input"
                 placeholder="ID da tag NFC"
                 maxlength="255">
+
+
+
+            <!-- DESCRIÇÃO -->
+
+            <textarea
+                id="descricaoInput"
+                class="modal-input modal-textarea"
+                placeholder="Descrição (aparece na página pública)"
+                maxlength="280"
+                rows="3"></textarea>
 
 
 

@@ -110,6 +110,9 @@ const nameInput =
 const tagIdInput =
     document.getElementById("tagIdInput");
 
+const descricaoInput =
+    document.getElementById("descricaoInput");
+
 const toast =
     document.getElementById("toast");
 
@@ -152,6 +155,8 @@ let todasAsTags = [];
 let modoEdicao = false;
 
 let toastTimer = null;
+
+let leituraNfcAtiva = false;
 
 
 // =====================================================
@@ -730,20 +735,9 @@ async function carregarTags() {
         todasAsTags.length === 0
     ) {
 
-        tagAtual = null;
-
-
-        cardId.textContent =
-            "NÃO CONECTADA";
-
-
-        currentTagName.textContent =
-            "Nenhuma tag cadastrada";
-
-
-        currentTagId.textContent =
-            "Faça uma leitura NFC.";
-
+        limparTagAtual(
+            "Nenhuma tag cadastrada"
+        );
 
         return;
     }
@@ -938,8 +932,7 @@ function mostrarTag(tag) {
 
     if (!tag) {
 
-        tagManagement.style.display =
-            "none";
+        limparTagAtual();
 
         return;
     }
@@ -948,8 +941,13 @@ function mostrarTag(tag) {
     tagAtual = tag;
 
 
+    const id =
+        tag.tag_id ||
+        "ID-DESCONHECIDO";
+
+
     cardId.textContent =
-        tag.tag_id.toUpperCase();
+        id.toUpperCase();
 
 
     currentTagName.textContent =
@@ -957,7 +955,7 @@ function mostrarTag(tag) {
 
 
     currentTagId.textContent =
-        tag.tag_id;
+        id;
 
 
     // ==========================================
@@ -1003,34 +1001,46 @@ function mostrarTag(tag) {
 
 }
 
-    if (!tag)
-        return;
 
+// =====================================================
+// LIMPAR TAG ATUAL
+// =====================================================
 
-    tagAtual =
-        tag;
+function limparTagAtual(
+    mensagem = "Nenhuma tag selecionada"
+) {
 
-
-    const id =
-        tag.tag_id ||
-        "ID-DESCONHECIDO";
-
-
-    const nome =
-        tag.nome ||
-        "Tag NFC";
+    tagAtual = null;
 
 
     cardId.textContent =
-        id.toUpperCase();
+        "NÃO CONECTADA";
 
 
     currentTagName.textContent =
-        nome;
+        mensagem;
 
 
     currentTagId.textContent =
-        id;
+        "Faça uma leitura NFC.";
+
+
+    tagVisibility.textContent =
+        "🔒 Privada";
+
+
+    tagVisibility.classList.remove(
+        "public"
+    );
+
+
+    tagVisibility.classList.add(
+        "private"
+    );
+
+
+    tagManagement.style.display =
+        "none";
 
 }
 
@@ -1127,6 +1137,10 @@ async function editarTag(
         tag.tag_id || "";
 
 
+    descricaoInput.value =
+        tag.descricao || "";
+
+
     tagIdInput.disabled =
         true;
 
@@ -1206,20 +1220,7 @@ async function excluirTag(
         String(id)
     ) {
 
-        tagAtual =
-            null;
-
-
-        cardId.textContent =
-            "NÃO CONECTADA";
-
-
-        currentTagName.textContent =
-            "Nenhuma tag selecionada";
-
-
-        currentTagId.textContent =
-            "Faça uma leitura NFC.";
+        limparTagAtual();
 
     }
 
@@ -1255,6 +1256,10 @@ openAddTagBtn.addEventListener(
 
 
         tagIdInput.value =
+            "";
+
+
+        descricaoInput.value =
             "";
 
 
@@ -1369,6 +1374,16 @@ function verificarNFC() {
 
 async function lerNFC() {
 
+    if (leituraNfcAtiva) {
+
+        mostrarToast(
+            "Leitura já iniciada. Aproxime a tag NFC."
+        );
+
+        return;
+    }
+
+
     if (!usuarioAtual) {
 
         mostrarToast(
@@ -1414,6 +1429,14 @@ async function lerNFC() {
         await ndef.scan();
 
 
+        leituraNfcAtiva =
+            true;
+
+
+        readNfcBtn.disabled =
+            false;
+
+
         ndef.onreading =
             async event => {
 
@@ -1439,10 +1462,6 @@ async function lerNFC() {
                     serialNumber
                 );
 
-
-                readNfcBtn.disabled =
-                    false;
-
             };
 
 
@@ -1457,10 +1476,6 @@ async function lerNFC() {
                     "Não foi possível ler a tag.",
                     "error"
                 );
-
-
-                readNfcBtn.disabled =
-                    false;
 
             };
 
@@ -1479,6 +1494,10 @@ async function lerNFC() {
             "Falha ao iniciar NFC.",
             "error"
         );
+
+
+        leituraNfcAtiva =
+            false;
 
 
         readNfcBtn.disabled =
@@ -1523,26 +1542,6 @@ async function processarTag(
                 tagId
             )
             .maybeSingle();
-
-
-if (!data || data.length === 0) {
-
-    tagAtual = null;
-
-    cardId.textContent =
-        "NÃO CONECTADA";
-
-    currentTagName.textContent =
-        "Nenhuma tag cadastrada";
-
-    currentTagId.textContent =
-        "Faça uma leitura NFC.";
-
-    tagManagement.style.display =
-        "none";
-
-    return;
-}
 
 
     if (error) {
@@ -1931,6 +1930,10 @@ addBtn.addEventListener(
             tagAtual.tag_id || "";
 
 
+        descricaoInput.value =
+            tagAtual.descricao || "";
+
+
         tagIdInput.disabled =
             true;
 
@@ -1987,6 +1990,10 @@ function fecharModal() {
         "";
 
 
+    descricaoInput.value =
+        "";
+
+
     tagIdInput.disabled =
         false;
 
@@ -2011,6 +2018,10 @@ saveBtn.addEventListener(
 
         const tagId =
             tagIdInput.value.trim();
+
+
+        const descricao =
+            descricaoInput.value.trim();
 
 
         if (!nome) {
@@ -2067,7 +2078,13 @@ saveBtn.addEventListener(
                         .from("tags_nfc")
                         .update({
 
-                            nome
+                            nome,
+
+                            descricao:
+                                descricao || null,
+
+                            atualizada_em:
+                                new Date().toISOString()
 
                         })
                         .eq(
@@ -2151,7 +2168,10 @@ saveBtn.addEventListener(
                         nome,
 
                         tag_id:
-                            tagId
+                            tagId,
+
+                        descricao:
+                            descricao || null
 
                     })
                     .select()
